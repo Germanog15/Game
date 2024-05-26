@@ -1,0 +1,56 @@
+With GAMING_currently_price AS (
+    SELECT
+  date_trunc('day',minute) AS date,
+  symbol,
+  AVG(price) AS Price
+FROM prices.usd
+WHERE
+  contract_address IN (0x62d0a8458ed7719fdaf978fe5929c6d342b0bfce, -- BEAM
+              0xf57e7e7c23978c3caec3c3548e3d615c346e79ff, -- IMX
+              0xd1d2eb1b1e90b638588728b4130137d262c87cae, -- GALA
+              0xbb0e17ef65f82ab018d8edd776e8dd940327b28b, -- AXS
+              0xb23d80f5fefcddaa212212f028021b41ded428cf,--  PRIME
+              0x767fe9edc9e0df98e07454847909b5e959d7ca0e, -- IVL
+              0x25f8087ead173b73d6e8b84329989a8eea16cf73, -- YGG
+              0x3429d03c6f7521aec737a0bbf2e5ddcef2c3ae31, -- PIXEL
+              0x4cb9a7ae498cedcbb5eae9f25736ae7d428c9d66, -- XAI
+              0x539bde0d7dbd336b79148aa742883198bbf60342, -- MAGIC
+              0x949d48eca67b17269629c7194f4b727d4ef9e5d6) -- MC
+  AND minute >= CURRENT_TIMESTAMP - INTERVAL '1' hour 
+Group by 1,2
+ORDER BY 1
+LIMIT 11 ),
+
+GAMING_price_60days AS (
+    SELECT
+  date_trunc('day',minute) AS date,
+  symbol,
+  AVG(price) AS Price
+FROM prices.usd
+WHERE
+  contract_address IN (0x62d0a8458ed7719fdaf978fe5929c6d342b0bfce, -- BEAM
+              0xf57e7e7c23978c3caec3c3548e3d615c346e79ff, -- IMX
+              0xd1d2eb1b1e90b638588728b4130137d262c87cae, -- GALA
+              0xbb0e17ef65f82ab018d8edd776e8dd940327b28b, -- AXS
+              0xb23d80f5fefcddaa212212f028021b41ded428cf,--  PRIME
+              0x767fe9edc9e0df98e07454847909b5e959d7ca0e, -- IVL
+              0x25f8087ead173b73d6e8b84329989a8eea16cf73, -- YGG
+              0x3429d03c6f7521aec737a0bbf2e5ddcef2c3ae31, -- PIXEL
+              0x4cb9a7ae498cedcbb5eae9f25736ae7d428c9d66, -- XAI
+              0x539bde0d7dbd336b79148aa742883198bbf60342, -- MAGIC
+              0x949d48eca67b17269629c7194f4b727d4ef9e5d6) -- MC
+  AND minute >= CURRENT_TIMESTAMP - INTERVAL '60' day 
+Group by 1,2
+ORDER BY 1
+LIMIT 11 )
+
+Select 
+    b.date AS date,
+    a.symbol AS symbol,
+    a.price AS CURRENT_PRICE,
+    b.price AS Price_60days,
+    (a.Price / b.price -1) AS _60days_price_change
+From GAMING_currently_price a
+JOIN GAMING_Price_60days b
+ON a.symbol = b.symbol
+ORDER BY 5
